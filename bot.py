@@ -226,7 +226,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await asyncio.sleep(2)
 
- if update.message.voice:
+if update.message.voice:
     msg = await update.message.reply_text(random.choice(voice_replies))
 elif update.message.audio:
     msg = await update.message.reply_text(random.choice(audio_replies))
