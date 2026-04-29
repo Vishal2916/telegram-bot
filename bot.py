@@ -2,6 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 from telegram.constants import ChatAction
 import asyncio, random
+asyncio.get_event_loop().close()
 
 TOKEN = "8614015067:AAG2Jb0OgRH06gtuu1ybTOM2FTLzdwsuyCE"
 OWNER_ID = 8625848837
@@ -250,4 +251,8 @@ app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
 print("🔥 BOT RUNNING PERFECT...")
-app.run_polling()
+
+app.run_polling(
+    drop_pending_updates=True,
+    allowed_updates=Update.ALL_TYPES
+)
