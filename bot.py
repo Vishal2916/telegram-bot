@@ -102,7 +102,12 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         action=ChatAction.TYPING
     )
 
-  async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # 👇 ADD THIS LINE
+    asyncio.create_task(auto_reply(update, context))
+
+
+# ✅ OUTSIDE (same level as handle)
+async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await asyncio.sleep(5)
 
@@ -121,17 +126,14 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = random.choice(text_replies)
 
-    # 👤 User info + spoiler
     final_text = f"👤 {name} ({uid})\n{text}"
     spoiler_text = f"||{final_text}||"
 
     msg = await update.message.reply_text(
         spoiler_text,
         parse_mode="MarkdownV2"
-
     )
 
-    # ✅ FIXED DELETE
     context.application.job_queue.run_once(
         delete_msg,
         5,
@@ -140,7 +142,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "message_id": msg.message_id
         }
     )
-
+    
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
