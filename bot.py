@@ -241,7 +241,6 @@ else:
 
 asyncio.create_task(auto_delete(msg))
 
-    })
 
 # ---------- RUN ----------
 app = ApplicationBuilder().token(TOKEN).build()
