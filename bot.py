@@ -102,24 +102,37 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         action=ChatAction.TYPING
     )
 
-    asyncio.create_task(auto_reply(update, context))
-
-async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await asyncio.sleep(5)
 
-    if update.message.voice:
-        msg = await update.message.reply_text(random.choice(voice_replies))
-    elif update.message.audio:
-        msg = await update.message.reply_text(random.choice(audio_replies))
-    elif update.message.video:
-        msg = await update.message.reply_text(random.choice(video_replies))
-    elif update.message.photo:
-        msg = await update.message.reply_text(random.choice(photo_replies))
-    else:
-        msg = await update.message.reply_text(random.choice(text_replies))
+    user = update.effective_user
+    name = f"{user.first_name} {user.last_name or ''}".strip()
+    uid = user.id
 
-    context.job_queue.run_once(
+    if update.message.voice:
+        text = random.choice(voice_replies)
+    elif update.message.audio:
+        text = random.choice(audio_replies)
+    elif update.message.video:
+        text = random.choice(video_replies)
+    elif update.message.photo:
+        text = random.choice(photo_replies)
+    else:
+        text = random.choice(text_replies)
+
+    # 👤 User info + spoiler
+    final_text = f"👤 {name} ({uid})\n{text}"
+    spoiler_text = f"||{final_text}||"
+
+    msg = await update.message.reply_text(
+        spoiler_text,
+        parse_mode="MarkdownV2"
+
+    )
+
+    # ✅ FIXED DELETE
+    context.application.job_queue.run_once(
         delete_msg,
         5,
         data={
