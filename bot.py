@@ -18,7 +18,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 Note :- You can submit earning proof and ask queries related to offers ❤️👍
 """
 
-    # Button
     keyboard = [
         [InlineKeyboardButton("🚀 Join Channel", url=CHANNEL_LINK)]
     ]
@@ -34,5 +33,6 @@ def main():
     print("Bot running 🚀")
     app.run_polling()
 
-if name == "main":
+# ✅ FIX HERE
+if __name__ == "__main__":
     main()
