@@ -131,7 +131,14 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = await update.message.reply_text(
         spoiler_text,
-        parse_mode="MarkdownV2"
+       
+       def escape(text):
+    escape_chars = r"\_*[]()~`>#+-=|{}.!"
+    return "".join("\\" + c if c in escape_chars else c for c in text)
+
+name = escape(name)
+text = escape(text)
+
     )
 
     context.application.job_queue.run_once(
@@ -142,7 +149,7 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "message_id": msg.message_id
         }
     )
-    
+
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
