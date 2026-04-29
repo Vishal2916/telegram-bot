@@ -205,7 +205,7 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     #await asyncio.sleep(5)
 
-     delay = random.randint(3, 7)
+    delay = random.randint(3, 7)
     await asyncio.sleep(delay)
 
     if not update.message:
