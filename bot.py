@@ -238,8 +238,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = await update.message.reply_text(random.choice(text_replies).replace("{name}", name))
 
-await asyncio.sleep(8)
-await msg.delete()
+context.job_queue.run_once(delete_msg, 8, data={
+    "chat_id": msg.chat_id,
+    "message_id": msg.message_id
+})
 
 # ---------- RUN ----------
 app = ApplicationBuilder().token(TOKEN).build()
