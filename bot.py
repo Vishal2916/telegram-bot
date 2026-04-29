@@ -238,7 +238,6 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = await update.message.reply_text(random.choice(text_replies).replace("{name}", name))
 
-   import asyncio
 await asyncio.sleep(8)
 await msg.delete()
 
