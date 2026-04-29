@@ -238,10 +238,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = await update.message.reply_text(random.choice(text_replies).replace("{name}", name))
 
-context.job_queue.run_once(delete_msg, 8, data={
-    "chat_id": msg.chat_id,
-    "message_id": msg.message_id
-})
+    context.job_queue.run_once(delete_msg, 8, data={
+        "chat_id": msg.chat_id,
+        "message_id": msg.message_id
+    })
 
 # ---------- RUN ----------
 app = ApplicationBuilder().token(TOKEN).build()
@@ -250,15 +250,10 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
-import asyncio
 import os
-
 print("🔥 BOT RUNNING PERFECT...", os.getpid())
 
-async def main():
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()   # polling start
-    await asyncio.Event().wait()        # infinite run
-
-asyncio.run(main())
+app.run_polling(
+    drop_pending_updates=True,
+    allowed_updates=Update.ALL_TYPES
+)
