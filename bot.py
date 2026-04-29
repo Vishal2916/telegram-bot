@@ -203,7 +203,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    await asyncio.sleep(5)
+    #await asyncio.sleep(5)
+
+     delay = random.randint(3, 7)
+    await asyncio.sleep(delay)
 
     if not update.message:
         return
