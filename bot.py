@@ -126,14 +126,15 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = random.choice(text_replies)
 
-    context.application.job_queue.run_once(
-        delete_msg,
-        5,
-        data={
-            "chat_id": msg.chat_id,
-            "message_id": msg.message_id
-        }
-    )
+
+   async def auto_delete(msg):
+    await asyncio.sleep(5)
+    try:
+        await msg.delete()
+    except:
+        pass
+
+asyncio.create_task(auto_delete(msg))
     
 app = ApplicationBuilder().token(TOKEN).build()
 
