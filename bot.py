@@ -250,10 +250,15 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
+import asyncio
 import os
+
 print("🔥 BOT RUNNING PERFECT...", os.getpid())
 
-app.run_polling(
-    drop_pending_updates=True,
-    close_loop=False
-)
+async def main():
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()   # polling start
+    await asyncio.Event().wait()        # infinite run
+
+asyncio.run(main())
