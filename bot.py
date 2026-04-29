@@ -1,14 +1,38 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = "8614015067:AAG2Jb0OgRH06gtuu1ybTOM2FTLzdwsuyCE"
+TOKEN = "YOUR_BOT_TOKEN"
+CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 Hello bhai! Bot working perfectly 😎")
+    user = update.effective_user.first_name
 
-app = ApplicationBuilder().token(TOKEN).build()
+    text = f"""👋 Welcome {user} !
 
-app.add_handler(CommandHandler("start", start))
+💼 Thank you for contacting our support  
+📩 Your request has been received  
 
-print("Bot is running...")
-app.run_polling()
+🎯 Join our official channel:
+🚀 {CHANNEL_LINK}
+
+Note :- You can submit earning proof and ask queries related to offers ❤️👍
+"""
+
+    # Button
+    keyboard = [
+        [InlineKeyboardButton("🚀 Join Channel", url=CHANNEL_LINK)]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(text, reply_markup=reply_markup)
+
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+
+    print("Bot running 🚀")
+    app.run_polling()
+
+if name == "main":
+    main()
