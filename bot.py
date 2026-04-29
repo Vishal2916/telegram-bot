@@ -28,12 +28,12 @@ def ensure_user(user):
     return uid
 
 # ---------- DELETE ----------
-async def delete_msg(context: ContextTypes.DEFAULT_TYPE):
+import asyncio
+
+async def auto_delete(msg):
+    await asyncio.sleep(5)
     try:
-        await context.bot.delete_message(
-            chat_id=context.job.data["chat_id"],
-            message_id=context.job.data["message_id"]
-        )
+        await msg.delete()
     except:
         pass
 
@@ -226,20 +226,21 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await asyncio.sleep(2)
 
-    if update.message.voice:
-        msg = await update.message.reply_text(random.choice(voice_replies))
-    elif update.message.audio:
-        msg = await update.message.reply_text(random.choice(audio_replies))
-    elif update.message.video:
-        msg = await update.message.reply_text(random.choice(video_replies))
-    elif update.message.photo:
-        msg = await update.message.reply_text(random.choice(photo_replies))
-    else:
-        msg = await update.message.reply_text(random.choice(text_replies).replace("{name}", name))
+ if update.message.voice:
+    msg = await update.message.reply_text(random.choice(voice_replies))
+elif update.message.audio:
+    msg = await update.message.reply_text(random.choice(audio_replies))
+elif update.message.video:
+    msg = await update.message.reply_text(random.choice(video_replies))
+elif update.message.photo:
+    msg = await update.message.reply_text(random.choice(photo_replies))
+else:
+    msg = await update.message.reply_text(
+        random.choice(text_replies).replace("{name}", name)
+    )
 
-    context.job_queue.run_once(delete_msg, 8, data={
-        "chat_id": msg.chat_id,
-        "message_id": msg.message_id
+asyncio.create_task(auto_delete(msg))
+
     })
 
 # ---------- RUN ----------
