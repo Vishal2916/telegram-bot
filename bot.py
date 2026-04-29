@@ -28,8 +28,9 @@ def ensure_user(user):
     return uid
 
 # ---------- DELETE ----------
+<<<<<<< HEAD
 import asyncio
-
+=======
 async def auto_delete(msg):
     await asyncio.sleep(5)
     try:
@@ -241,6 +242,10 @@ else:
 
 asyncio.create_task(auto_delete(msg))
 
+<<<<<<< HEAD
+=======
+    asyncio.create_task(auto_delete(msg))
+>>>>>>> b5fa050 (auto delete fixed final)
 
 # ---------- RUN ----------
 app = ApplicationBuilder().token(TOKEN).build()
