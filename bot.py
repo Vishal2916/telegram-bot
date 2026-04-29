@@ -253,4 +253,7 @@ app.add_handler(MessageHandler(filters.ALL, handle))
 import os
 print("🔥 BOT RUNNING PERFECT...", os.getpid())
 
-app.run_polling(drop_pending_updates=True)
+app.run_polling(
+    drop_pending_updates=True,
+    close_loop=False
+)
