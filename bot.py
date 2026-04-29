@@ -126,21 +126,6 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = random.choice(text_replies)
 
-    final_text = f"👤 {name} ({uid})\n{text}"
-    spoiler_text = f"||{final_text}||"
-
-    msg = await update.message.reply_text(
-        spoiler_text,
-       
-       def escape(text):
-    escape_chars = r"\_*[]()~`>#+-=|{}.!"
-    return "".join("\\" + c if c in escape_chars else c for c in text)
-
-name = escape(name)
-text = escape(text)
-
-    )
-
     context.application.job_queue.run_once(
         delete_msg,
         5,
@@ -149,7 +134,7 @@ text = escape(text)
             "message_id": msg.message_id
         }
     )
-
+    
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
