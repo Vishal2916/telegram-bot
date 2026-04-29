@@ -250,9 +250,7 @@ app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
-print("🔥 BOT RUNNING PERFECT...")
+import os
+print("🔥 BOT RUNNING PERFECT...", os.getpid())
 
-app.run_polling(
-    drop_pending_updates=True,
-    allowed_updates=Update.ALL_TYPES
-)
+app.run_polling(drop_pending_updates=True)
