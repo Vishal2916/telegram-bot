@@ -10,6 +10,12 @@ CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 users = {}
 user_map = {}
 
+# 📊 STATS SYSTEM
+stats = {
+    "total_messages": 0,
+    "active_users": set()
+}
+
 def join_button():
     return InlineKeyboardMarkup([[InlineKeyboardButton("🚀 Join Channel", url=CHANNEL_LINK)]])
 
@@ -182,6 +188,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     uid = ensure_user(user)
 
+    # 📊 TRACK STATS
+    stats["total_messages"] += 1
+    stats["active_users"].add(uid)
+
     if uid == OWNER_ID:
         return
 
@@ -225,7 +235,7 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = random.choice(text_replies).format(name=name)
 
-    # ✅ SEND MESSAGE
+   # ✅ SEND MESSAGE
     msg = await update.message.reply_text(text)
 
     # ✅ AUTO DELETE FUNCTION
@@ -238,10 +248,28 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     asyncio.create_task(auto_delete())
 
-    
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    total_users = len(users)
+    active_users = len(stats["active_users"])
+    total_messages = stats["total_messages"]
+
+    text = f"""📊 Bot Stats
+
+👥 Total Users: {total_users}
+⚡ Active Users: {active_users}
+💬 Total Messages: {total_messages}
+"""
+
+    await update.message.reply_text(text)
+
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("stats", stats_command))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
