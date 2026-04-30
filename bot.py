@@ -255,6 +255,7 @@ async def auto_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     asyncio.create_task(auto_delete())
 
+#STATS WALA CODE HAI YE PURA 
 async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.effective_user.id != OWNER_ID:
@@ -272,6 +273,95 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
     await update.message.reply_text(text)
+
+#BROADCAST TEXT MESSAGE CODE FINAL 
+async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not context.args:
+        await update.message.reply_text("❌ Usage: /broadcast your message")
+        return
+
+    message = " ".join(context.args)
+
+    sent = 0
+    failed = 0
+    total = len(users)
+
+    status_msg = await update.message.reply_text("📣 Broadcasting started...")
+
+    for uid in users:
+        try:
+            await context.bot.send_message(chat_id=uid, text=message)
+            sent += 1
+        except:
+            failed += 1
+
+        if (sent + failed) % 20 == 0:
+            await status_msg.edit_text(
+                f"📣 Broadcasting...\n\n📤 Sent: {sent}\n❌ Failed: {failed}\n👥 Total: {total}"
+            )
+
+        await asyncio.sleep(0.05)
+
+    await status_msg.edit_text(
+        f"✅ Broadcast Complete\n\n📤 Sent: {sent}\n❌ Failed: {failed}\n👥 Total Users: {total}"
+    )
+
+
+#BROADCAST PHOTO FULL CODE FINAL 
+async def broadcast_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to photo message")
+        return
+
+    msg = update.message.reply_to_message
+
+    if not msg.photo:
+        await update.message.reply_text("❌ Please reply to a photo")
+        return
+
+    caption = msg.caption or ""
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("💰 Join & Earn", url=CHANNEL_LINK)]
+    ])
+
+    sent = 0
+    failed = 0
+    total = len(users)
+
+    status_msg = await update.message.reply_text("📣 Photo broadcast started...")
+
+    for uid in users:
+        try:
+            await context.bot.send_photo(
+                chat_id=uid,
+                photo=msg.photo[-1].file_id,
+                caption=caption,
+                reply_markup=keyboard
+            )
+            sent += 1
+        except:
+            failed += 1
+
+        if (sent + failed) % 20 == 0:
+            await status_msg.edit_text(
+                f"📣 Broadcasting Photo...\n\n📤 Sent: {sent}\n❌ Failed: {failed}\n👥 Total: {total}"
+            )
+
+        await asyncio.sleep(0.05)
+
+    await status_msg.edit_text(
+        f"✅ Photo Broadcast Done\n\n📤 Sent: {sent}\n❌ Failed: {failed}\n👥 Total Users: {total}"
+    )
+
 
 #BAN CODE COMPLETE 
 async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -315,6 +405,8 @@ app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("stats", stats_command))
+app.add_handler(CommandHandler("broadcast", broadcast))
+app.add_handler(CommandHandler("broadcastphoto", broadcast_photo))
 app.add_handler(CommandHandler("ban", ban_user))
 app.add_handler(CommandHandler("unban", unban_user))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
