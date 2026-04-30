@@ -29,11 +29,30 @@ def load_users():
 # 🚫 BAN SYSTEM
 banned_users = set()
 
-# 📊 STATS SYSTEM
+    # 📊 STATS SYSTEM
 stats = {
     "total_messages": 0,
     "active_users": set()
 }
+
+# 💾 SAVE STATS
+def save_stats():
+    with open("stats.json", "w") as f:
+        json.dump({
+            "total_messages": stats["total_messages"],
+            "active_users": list(stats["active_users"])
+        }, f)
+
+# 📂 LOAD STATS
+def load_stats():
+    global stats
+    try:
+        with open("stats.json", "r") as f:
+            data = json.load(f)
+            stats["total_messages"] = data["total_messages"]
+            stats["active_users"] = set(data["active_users"])
+    except:
+        pass
 
 def join_button():
     return InlineKeyboardMarkup([[InlineKeyboardButton("🚀 Join Channel", url=CHANNEL_LINK)]])
@@ -211,6 +230,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 📊 TRACK STATS
     stats["total_messages"] += 1
     stats["active_users"].add(uid)
+    save_stats()
 
 # 🚫 CHECK IF BANNED
     if uid in banned_users:
@@ -423,6 +443,8 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"✅ User {uid} unbanned")
 
 load_users()
+load_stats()
+
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
