@@ -10,6 +10,9 @@ CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 users = {}
 user_map = {}
 
+# 🚫 BAN SYSTEM
+banned_users = set()
+
 # 📊 STATS SYSTEM
 stats = {
     "total_messages": 0,
@@ -192,6 +195,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stats["total_messages"] += 1
     stats["active_users"].add(uid)
 
+# 🚫 CHECK IF BANNED
+    if uid in banned_users:
+        return
+
     if uid == OWNER_ID:
         return
 
@@ -266,10 +273,50 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(text)
 
+#BAN CODE COMPLETE 
+async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to user message to ban")
+        return
+
+    mid = update.message.reply_to_message.message_id
+
+    if mid in user_map:
+        uid = user_map[mid]
+        banned_users.add(uid)
+
+        await update.message.reply_text(f"🚫 User {uid} banned successfully")
+
+
+#UNBAN USER CODE FREE 
+async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to user message to unban")
+        return
+
+    mid = update.message.reply_to_message.message_id
+
+    if mid in user_map:
+        uid = user_map[mid]
+
+        if uid in banned_users:
+            banned_users.remove(uid)
+            await update.message.reply_text(f"✅ User {uid} unbanned")
+
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("stats", stats_command))
+app.add_handler(CommandHandler("ban", ban_user))
+app.add_handler(CommandHandler("unban", unban_user))
 app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
