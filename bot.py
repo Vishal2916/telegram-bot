@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 from telegram.constants import ChatAction
 import asyncio, random
 
-TOKEN = "8614015067:AAG2Jb0OgRH06gtuu1ybTOM2FTLzdwsuyCE"
+TOKEN = "8614015067:AAHnPLcimJz30sAbRxAFNLv_f1L6bS8INBc"
 OWNER_ID = 8625848837
 CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 
