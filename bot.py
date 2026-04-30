@@ -2,6 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 from telegram.constants import ChatAction
 import asyncio, random
+import json
 
 TOKEN = "8614015067:AAHnPLcimJz30sAbRxAFNLv_f1L6bS8INBc"
 OWNER_ID = 8625848837
@@ -9,6 +10,21 @@ CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 
 users = {}
 user_map = {}
+
+# 💾 SAVE USERS
+def save_users():
+    with open("users.json", "w") as f:
+        json.dump(users, f)
+
+# 📂 LOAD USERS
+def load_users():
+    global users
+    try:
+        with open("users.json", "r") as f:
+            users = json.load(f)
+            users = {int(k): v for k, v in users.items()}
+    except:
+        users = {}
 
 # 🚫 BAN SYSTEM
 banned_users = set()
@@ -26,6 +42,7 @@ def ensure_user(user):
     uid = user.id
     name = f"{user.first_name} {user.last_name or ''}".strip()
     users[uid] = {"name": name}
+    save_users()
     return uid
 
 async def delete_msg(context: ContextTypes.DEFAULT_TYPE):
@@ -298,6 +315,8 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent += 1
         except:
             failed += 1
+            users.pop(uid, None)   # 🚫 remove blocked user
+            save_users()           # 💾 update file
 
         if (sent + failed) % 20 == 0:
             await status_msg.edit_text(
@@ -350,6 +369,8 @@ async def broadcast_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent += 1
         except:
             failed += 1
+            users.pop(uid, None)
+            save_users()
 
         if (sent + failed) % 20 == 0:
             await status_msg.edit_text(
@@ -401,6 +422,7 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
             banned_users.remove(uid)
             await update.message.reply_text(f"✅ User {uid} unbanned")
 
+load_users()
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
