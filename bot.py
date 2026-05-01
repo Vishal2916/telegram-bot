@@ -252,11 +252,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     stats["active_users"].add(uid)
     save_stats()
 
-    # 🆕 NEW USER ALERT
-    if is_new:
+        # 🆕 NEW USER ALERT
+    if is_new or uid == OWNER_ID::
 
         user = update.effective_user
-
         username = f"@{user.username}" if user.username else "No Username"
 
         first_name = escape(user.first_name or "N/A")
@@ -274,6 +273,12 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🆔 ID: ||{user_id}||\n"
             f"⏱️ Joined: ||{join_time}||\n"
             f"📍 Source: ||{source}||"
+        )
+
+        await context.bot.send_message(
+            chat_id=OWNER_ID,
+            text=text,
+            parse_mode="MarkdownV2"
         )
 
         await context.bot.send_message(
