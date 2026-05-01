@@ -422,6 +422,14 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(f"🚫 User {uid} banned successfully")
 
+        try:
+            await context.bot.send_message(
+                chat_id=uid,
+                text="🚫 आपको admin द्वारा ban कर दिया गया है.\nअब आप message नहीं भेज सकते."
+            )
+        except:
+            pass
+
 
 #UNBAN USER CODE FREE 
 async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -440,7 +448,16 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if uid in banned_users:
             banned_users.remove(uid)
+
             await update.message.reply_text(f"✅ User {uid} unbanned")
+
+            try:
+                await context.bot.send_message(
+                    chat_id=uid,
+                    text="✅ आपको unban कर दिया गया है.\nअब आप फिर से message भेज सकते हैं 🙂"
+                )
+            except:
+                pass
 
 load_users()
 load_stats()
