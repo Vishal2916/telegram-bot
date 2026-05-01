@@ -255,6 +255,7 @@ save_stats()
 
 # 🆕 NEW USER ALERT
 if is_new or uid == OWNER_ID:
+    users.pop(uid, None)  # 👈 सिर्फ testing के लिए
 
     user = update.effective_user
     username = f"@{user.username}" if user.username else "No Username"
@@ -274,6 +275,25 @@ if is_new or uid == OWNER_ID:
         f"🆔 ID: ||{user_id}||\n"
         f"⏱️ Joined: ||{join_time}||\n"
         f"📍 Source: ||{source}||"
+    )
+
+    await context.bot.send_message(
+        chat_id=OWNER_ID,
+        text=text,
+        parse_mode="MarkdownV2"
+    )
+
+    async def test_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    uid = user.id
+
+    username = f"@{user.username}" if user.username else "No Username"
+
+    text = (
+        f"🧪 TEST USER\n\n"
+        f"👤 Name: ||{escape(user.first_name)}||\n"
+        f"🔗 Username: ||{escape(username)}||\n"
+        f"🆔 ID: ||{escape(uid)}||"
     )
 
     await context.bot.send_message(
@@ -515,6 +535,7 @@ load_stats()
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("test", test_user))
 app.add_handler(CommandHandler("stats", stats_command))
 app.add_handler(CommandHandler("broadcast", broadcast))
 app.add_handler(CommandHandler("broadcastphoto", broadcast_photo))
