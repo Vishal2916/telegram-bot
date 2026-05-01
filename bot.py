@@ -286,7 +286,8 @@ if is_new or uid == OWNER_ID:
         parse_mode="MarkdownV2"
     )
 
-    async def test_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def test_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     user = update.effective_user
     uid = user.id
 
@@ -294,7 +295,7 @@ if is_new or uid == OWNER_ID:
 
     text = (
         f"🧪 TEST USER\n\n"
-        f"👤 Name: ||{escape(user.first_name)}||\n"
+        f"👤 Name: ||{escape(user.first_name or 'N/A')}||\n"
         f"🔗 Username: ||{escape(username)}||\n"
         f"🆔 ID: ||{escape(uid)}||"
     )
