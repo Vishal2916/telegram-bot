@@ -90,12 +90,67 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     if update.effective_user.id != OWNER_ID:
         return
-    if update.message.reply_to_message:
-        mid = update.message.reply_to_message.message_id
-        if mid in user_map:
-            await context.bot.send_message(chat_id=user_map[mid], text=update.message.text)
+
+    if not update.message.reply_to_message:
+        return
+
+    mid = update.message.reply_to_message.message_id
+
+    if mid not in user_map:
+        return
+
+    uid = user_map[mid]
+    msg = update.message
+
+    try:
+        # 💬 TEXT
+        if msg.text:
+            await context.bot.send_message(chat_id=uid, text=msg.text)
+
+        # 📸 PHOTO
+        elif msg.photo:
+            await context.bot.send_photo(
+                chat_id=uid,
+                photo=msg.photo[-1].file_id,
+                caption=msg.caption or ""
+            )
+
+        # 🎥 VIDEO
+        elif msg.video:
+            await context.bot.send_video(
+                chat_id=uid,
+                video=msg.video.file_id,
+                caption=msg.caption or ""
+            )
+
+        # 🎧 AUDIO
+        elif msg.audio:
+            await context.bot.send_audio(
+                chat_id=uid,
+                audio=msg.audio.file_id,
+                caption=msg.caption or ""
+            )
+
+        # 🎤 VOICE
+        elif msg.voice:
+            await context.bot.send_voice(
+                chat_id=uid,
+                voice=msg.voice.file_id
+            )
+
+        # 📄 DOCUMENT
+        elif msg.document:
+            await context.bot.send_document(
+                chat_id=uid,
+                document=msg.document.file_id,
+                caption=msg.caption or ""
+            )
+
+    except Exception as e:
+        print("Error in owner_reply:", e))
 
 # 🎤 VOICE (10 Hindi + 10 English)
 voice_replies = [
@@ -470,7 +525,7 @@ app.add_handler(CommandHandler("broadcast", broadcast))
 app.add_handler(CommandHandler("broadcastphoto", broadcast_photo))
 app.add_handler(CommandHandler("ban", ban_user))
 app.add_handler(CommandHandler("unban", unban_user))
-app.add_handler(MessageHandler(filters.REPLY & filters.TEXT, owner_reply))
+app.add_handler(MessageHandler(filters.REPLY, owner_reply))
 app.add_handler(MessageHandler(filters.ALL, handle))
 
 print("🔥 FINAL PRO BOT RUNNING...")
