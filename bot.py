@@ -3,6 +3,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 from telegram.constants import ChatAction
 import asyncio, random
 import json
+from datetime import datetime
+import re
 
 TOKEN = "8614015067:AAHnPLcimJz30sAbRxAFNLv_f1L6bS8INBc"
 OWNER_ID = 8625848837
@@ -10,6 +12,10 @@ CHANNEL_LINK = "https://t.me/+uK3bdZ68BmhmMWM1"
 
 users = {}
 user_map = {}
+
+# 🔐 ESCAPE FUNCTION (MarkdownV2 safe)
+def escape(text):
+    return re.sub(r'([_*\\[\\]()~`>#+\\-=|{}.!])', r'\\\\\\1', str(text))
 
 # 💾 SAVE USERS
 def save_users():
@@ -57,12 +63,21 @@ def load_stats():
 def join_button():
     return InlineKeyboardMarkup([[InlineKeyboardButton("🚀 Join Channel", url=CHANNEL_LINK)]])
 
-def ensure_user(user):
+def ensure_user(user, source="direct"):
     uid = user.id
     name = f"{user.first_name} {user.last_name or ''}".strip()
-    users[uid] = {"name": name}
-    save_users()
-    return uid
+
+    is_new = uid not in users
+
+    if is_new:
+        users[uid] = {
+            "name": name,
+            "joined_at": datetime.now().strftime("%d-%m-%Y %H:%M"),
+            "source": source
+        }
+        save_users()
+
+    return uid, is_new
 
 async def delete_msg(context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -73,9 +88,14 @@ async def delete_msg(context: ContextTypes.DEFAULT_TYPE):
     except:
         pass
 
+#START WALA CODE 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
     user = update.effective_user
-    ensure_user(user)
+
+    source = context.args[0] if context.args else "direct"
+
+    uid, is_new = ensure_user(user, source)
 
     name = users[user.id]["name"]
 
@@ -225,12 +245,42 @@ text_replies = [
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user = update.effective_user
-    uid = ensure_user(user)
+    uid, is_new = ensure_user(user)
 
     # 📊 TRACK STATS
     stats["total_messages"] += 1
     stats["active_users"].add(uid)
     save_stats()
+
+    # 🆕 NEW USER ALERT
+    if is_new:
+
+        user = update.effective_user
+
+        username = f"@{user.username}" if user.username else "No Username"
+
+        first_name = escape(user.first_name or "N/A")
+        last_name = escape(user.last_name or "N/A")
+        username = escape(username)
+        user_id = escape(user.id)
+
+        join_time = escape(users[uid]["joined_at"])
+        source = escape(users[uid]["source"])
+
+        text = (
+            f"🆕 *NEW USER JOINED*\n\n"
+            f"👤 Name: ||{first_name} {last_name}||\n"
+            f"🔗 Username: ||{username}||\n"
+            f"🆔 ID: ||{user_id}||\n"
+            f"⏱️ Joined: ||{join_time}||\n"
+            f"📍 Source: ||{source}||"
+        )
+
+        await context.bot.send_message(
+            chat_id=OWNER_ID,
+            text=text,
+            parse_mode="MarkdownV2"
+        )
 
 # 🚫 CHECK IF BANNED
     if uid in banned_users:
