@@ -150,7 +150,8 @@ async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        print("Error in owner_reply:", e))
+        print("Error in owner_reply:", e)
+        
 
 # 🎤 VOICE (10 Hindi + 10 English)
 voice_replies = [
