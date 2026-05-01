@@ -15,7 +15,7 @@ user_map = {}
 
 # 🔐 ESCAPE FUNCTION (MarkdownV2 safe)
 def escape(text):
-    return re.sub(r'([_*\\[\\]()~`>#+\\-=|{}.!])', r'\\\\\\1', str(text))
+    return re.sub(r'([_*\[\]()~`>#+\-=|{}.!])', r'\\\1', str(text))
 
 # 💾 SAVE USERS
 def save_users():
@@ -248,44 +248,39 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid, is_new = ensure_user(user)
 
     # 📊 TRACK STATS
-    stats["total_messages"] += 1
-    stats["active_users"].add(uid)
-    save_stats()
+    # 📊 TRACK STATS
+stats["total_messages"] += 1
+stats["active_users"].add(uid)
+save_stats()
 
-        # 🆕 NEW USER ALERT
-    if is_new or uid == OWNER_ID:
+# 🆕 NEW USER ALERT
+if is_new or uid == OWNER_ID:
 
-        user = update.effective_user
-        username = f"@{user.username}" if user.username else "No Username"
+    user = update.effective_user
+    username = f"@{user.username}" if user.username else "No Username"
 
-        first_name = escape(user.first_name or "N/A")
-        last_name = escape(user.last_name or "N/A")
-        username = escape(username)
-        user_id = escape(user.id)
+    first_name = escape(user.first_name or "N/A")
+    last_name = escape(user.last_name or "N/A")
+    username = escape(username)
+    user_id = escape(user.id)
 
-        join_time = escape(users[uid]["joined_at"])
-        source = escape(users[uid]["source"])
+    join_time = escape(users[uid]["joined_at"])
+    source = escape(users[uid]["source"])
 
-        text = (
-            f"🆕 *NEW USER JOINED*\n\n"
-            f"👤 Name: ||{first_name} {last_name}||\n"
-            f"🔗 Username: ||{username}||\n"
-            f"🆔 ID: ||{user_id}||\n"
-            f"⏱️ Joined: ||{join_time}||\n"
-            f"📍 Source: ||{source}||"
-        )
+    text = (
+        f"🆕 *NEW USER JOINED*\n\n"
+        f"👤 Name: ||{first_name} {last_name}||\n"
+        f"🔗 Username: ||{username}||\n"
+        f"🆔 ID: ||{user_id}||\n"
+        f"⏱️ Joined: ||{join_time}||\n"
+        f"📍 Source: ||{source}||"
+    )
 
-        await context.bot.send_message(
-            chat_id=OWNER_ID,
-            text=text,
-            parse_mode="MarkdownV2"
-        )
-
-        await context.bot.send_message(
-            chat_id=OWNER_ID,
-            text=text,
-            parse_mode="MarkdownV2"
-        )
+    await context.bot.send_message(
+        chat_id=OWNER_ID,
+        text=text,
+        parse_mode="MarkdownV2"
+    )
 
 # 🚫 CHECK IF BANNED
     if uid in banned_users:
