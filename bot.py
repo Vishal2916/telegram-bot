@@ -253,7 +253,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_stats()
 
         # 🆕 NEW USER ALERT
-    if is_new or uid == OWNER_ID::
+    if is_new or uid == OWNER_ID:
 
         user = update.effective_user
         username = f"@{user.username}" if user.username else "No Username"
