@@ -253,6 +253,10 @@ stats["total_messages"] += 1
 stats["active_users"].add(uid)
 save_stats()
 
+# 🧪 OWNER TEST MODE
+if uid == OWNER_ID:
+    users.pop(uid, None)
+    
 # 🆕 NEW USER ALERT
 if is_new or uid == OWNER_ID:
     users.pop(uid, None)  # 👈 सिर्फ testing के लिए
