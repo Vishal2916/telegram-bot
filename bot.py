@@ -287,7 +287,6 @@ if is_new or uid == OWNER_ID:
     )
 
 async def test_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     user = update.effective_user
     uid = user.id
 
@@ -301,7 +300,7 @@ async def test_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await context.bot.send_message(
-        chat_id=OWNER_ID,
+        chat_id=update.effective_chat.id,
         text=text,
         parse_mode="MarkdownV2"
     )
