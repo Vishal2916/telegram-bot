@@ -4,7 +4,7 @@ from telegram.constants import ChatAction
 import asyncio, random
 import json
 
-TOKEN = "8614015067:AAHnPLcimJz30sAbRxAFNLv_f1L6bS8INBc"
+TOKEN = "8614015067:AAFBWxH0oEvV5nU42R5ZGyWt-OLtHjUxbSA"
 OWNER_ID = 8625848837
 CHANNEL_LINK = "https://t.me/+YA3EGdC2MzNlMWM1"
 
