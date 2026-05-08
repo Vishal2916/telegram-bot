@@ -10,6 +10,7 @@ CHANNEL_LINK = "https://t.me/+YA3EGdC2MzNlMWM1"
 
 users = {}
 user_map = {}
+reply_map = {}
 
 # 💾 SAVE USERS
 def save_users():
@@ -102,20 +103,30 @@ async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if mid not in user_map:
         return
 
-    uid = user_map[mid]
+    data = user_map[mid]
+
+    uid = data["uid"]
+    original_message_id = data["original_message_id"]
+
     msg = update.message
 
     try:
         # 💬 TEXT
         if msg.text:
-            await context.bot.send_message(chat_id=uid, text=msg.text)
+            await context.bot.send_message(
+    chat_id=uid,
+    text=msg.text,
+    reply_to_message_id=original_message_id
+            )
 
         # 📸 PHOTO
         elif msg.photo:
             await context.bot.send_photo(
                 chat_id=uid,
                 photo=msg.photo[-1].file_id,
-                caption=msg.caption or ""
+                caption=msg.caption or "",
+
+           reply_to_message_id=original_message_id
             )
 
         # 🎥 VIDEO
@@ -123,7 +134,9 @@ async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_video(
                 chat_id=uid,
                 video=msg.video.file_id,
-                caption=msg.caption or ""
+                caption=msg.caption or "",
+
+            reply_to_message_id=original_message_id
             )
 
         # 🎧 AUDIO
@@ -131,14 +144,18 @@ async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_audio(
                 chat_id=uid,
                 audio=msg.audio.file_id,
-                caption=msg.caption or ""
+                caption=msg.caption or "",
+
+            reply_to_message_id=original_message_id
             )
 
         # 🎤 VOICE
         elif msg.voice:
             await context.bot.send_voice(
                 chat_id=uid,
-                voice=msg.voice.file_id
+                voice=msg.voice.file_id,
+
+            reply_to_message_id=original_message_id
             )
 
         # 📄 DOCUMENT
@@ -146,7 +163,9 @@ async def owner_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_document(
                 chat_id=uid,
                 document=msg.document.file_id,
-                caption=msg.caption or ""
+                caption=msg.caption or "",
+
+            reply_to_message_id=original_message_id
             )
 
     except Exception as e:
@@ -300,7 +319,10 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         from_chat_id=update.effective_chat.id,
         message_id=update.message.message_id
     )
-    user_map[fwd.message_id] = uid
+    user_map[fwd.message_id] = {
+    "uid": uid,
+    "original_message_id": update.message.message_id
+    }
 
     await context.bot.send_chat_action(
         chat_id=update.effective_chat.id,
@@ -473,7 +495,7 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mid = update.message.reply_to_message.message_id
 
     if mid in user_map:
-        uid = user_map[mid]
+        uid = user_map[mid]["uid"]
         banned_users.add(uid)
 
         await update.message.reply_text(f"🚫 User {uid} banned successfully")
@@ -500,7 +522,7 @@ async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mid = update.message.reply_to_message.message_id
 
     if mid in user_map:
-        uid = user_map[mid]
+        uid = user_map[mid]["uid"]
 
         if uid in banned_users:
             banned_users.remove(uid)
